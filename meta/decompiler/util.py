@@ -6,7 +6,7 @@ Created on Jul 15, 2011
 
 import _ast
 import sys
-py3 = sys.version_info.major >= 3
+py3 = sys.version_info[0] >= 3
 
 def ast_keys(node):
     return node._fields

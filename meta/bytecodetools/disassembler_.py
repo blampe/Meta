@@ -11,16 +11,16 @@ from dis import findlabels, findlinestarts
 import sys
 from meta.bytecodetools.instruction import Instruction
 
-py3 = sys.version_info.major >= 3
+py3 = sys.version_info[0] >= 3
 co_ord = (lambda c:c) if py3 else ord
 
 def disassembler(co, lasti= -1):
-    """Disassemble a code object. 
-    
+    """Disassemble a code object.
+
     :param co: code object
     :param lasti: internal
     :yields: Instructions.
-    
+
     """
 
     code = co.co_code
@@ -34,8 +34,8 @@ def disassembler(co, lasti= -1):
     while i < n:
         c = code[i]
         op = co_ord(c)
-    
-    
+
+
         if i in linestarts:
             lineno = linestarts[i]
 

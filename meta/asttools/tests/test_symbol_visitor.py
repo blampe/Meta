@@ -21,29 +21,29 @@ class Test(unittest.TestCase):
 
 
     def test_simple(self):
-        self.assertHasSymbols('a', {'a'})
+        self.assertHasSymbols('a', set(['a']))
 
     def test_load(self):
-        self.assertHasSymbols('a', {'a'}, ast.Load)
+        self.assertHasSymbols('a', set(['a']), ast.Load)
         self.assertHasSymbols('a', set(), ast.Store)
 
     def test_store(self):
-        self.assertHasSymbols('a = 1', {'a'}, ast.Store)
+        self.assertHasSymbols('a = 1', set(['a']), ast.Store)
         self.assertHasSymbols('a = 1', set(), ast.Load)
 
     def test_store_item(self):
-        self.assertHasSymbols('a[:] = 1', {'a'}, ast.Load)
+        self.assertHasSymbols('a[:] = 1', set(['a']), ast.Load)
         self.assertHasSymbols('a[:] = 1', set(), ast.Store)
 
     def test_store_attr(self):
 
-        self.assertHasSymbols('a.b = 1', {'a'}, ast.Load)
+        self.assertHasSymbols('a.b = 1', set(['a']), ast.Load)
         self.assertHasSymbols('a.b = 1', set(), ast.Store)
 
     def test_for(self):
 
-        self.assertHasSymbols('for i in x:\n    a.b = 1', {'a', 'x'}, ast.Load)
-        self.assertHasSymbols('for i in x:\n    a.b = 1', {'i'}, ast.Store)
+        self.assertHasSymbols('for i in x:\n    a.b = 1', set(['a', 'x']), ast.Load)
+        self.assertHasSymbols('for i in x:\n    a.b = 1', set(['i']), ast.Store)
 
 
 if __name__ == '__main__':

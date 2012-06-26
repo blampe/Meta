@@ -5,11 +5,20 @@ Created on Nov 5, 2011
 '''
 
 import sys
-import unittest
 
-py2 = sys.version_info.major < 3
+py2 = sys.version_info[0] < 3
+py27 = py2 and sys.version_info[1] >= 7
 py3 = not py2
 
-py2only = unittest.skipIf(not py2, "Only valid for python 2.x")
+def skip_if(should_skip, message):
+	def decorator(method):
+		def wrapper(*args, **kwargs):
+			if should_skip:
+				print message
+			else:
+				return method(*args, **kwargs)
+	return decorator
 
-py3only = unittest.skipIf(not py3, "Only valid for python 3.x")
+py2only = skip_if(not py2, "Only valid for python 2.x")
+
+py3only = skip_if(not py3, "Only valid for python 3.x")

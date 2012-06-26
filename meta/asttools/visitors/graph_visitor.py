@@ -57,7 +57,7 @@ class CollectNodes(Visitor):
             if not self.graph.has_edge(node.id, ctx_var):
                 self.graph.add_edge(node.id, ctx_var)
 
-        return {node.id}
+        return set([node.id])
 
     def visitalias(self, node):
         name = node.asname if node.asname else node.name
@@ -68,7 +68,7 @@ class CollectNodes(Visitor):
         if not self.graph.has_node(name):
             self.graph.add_node(name)
 
-        return {name}
+        return set([name])
 
     def visitCall(self, node):
         left = self.visit(node.func)
@@ -104,7 +104,7 @@ class CollectNodes(Visitor):
             self.modified.update(targets)
             add_edges(self.graph, targets, sources)
             return targets
-        
+
     def handle_generators(self, generators):
         defined = set()
         required = set()
@@ -112,9 +112,9 @@ class CollectNodes(Visitor):
             get_symbols(generator, _ast.Load)
             required.update(get_symbols(generator, _ast.Load) - defined)
             defined.update(get_symbols(generator, _ast.Store))
-            
+
         return defined, required
-    
+
     def visitListComp(self, node):
 
         defined, required = self.handle_generators(node.generators)
@@ -385,11 +385,11 @@ class GraphGen(CollectNodes):
 def make_graph(node, call_deps=False):
     '''
     Create a dependency graph from an ast node.
-    
+
     :param node: ast node.
     :param call_deps: if true, then the graph will create a cyclic dependance for all
                       function calls. (i.e for `a.b(c)` a depends on b and b depends on a)
-                      
+
     :returns: a tuple of (graph, undefined)
     '''
 

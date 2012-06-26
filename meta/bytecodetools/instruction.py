@@ -8,13 +8,13 @@ from __future__ import print_function
 import opcode
 import sys
 
-py3 = sys.version_info.major >= 3
+py3 = sys.version_info[0] >= 3
 co_ord = (lambda c:c) if py3 else ord
 
 
 class Instruction(object):
     '''
-    A Python byte-code instruction. 
+    A Python byte-code instruction.
     '''
     def __init__(self, i= -1, op=None, lineno=None):
         self.i = i
@@ -85,4 +85,4 @@ class Instruction(object):
                 result.append('(' + repr(self.arg) + ')')
         return ' '.join(result)
 
-        
+

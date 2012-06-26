@@ -7,24 +7,23 @@ from __future__ import print_function
 import unittest
 import ast
 from meta.asttools.visitors.graph_visitor import GraphGen
-from meta.asttools.visitors.graph_visitor import DiGraph
 from meta.asttools.tests import AllTypesTested, skip_networkx
 
 tested = AllTypesTested()
 
- 
+
 def binop_method(op):
     def test_binop(self):
         source = 'c = a %s b' % (op,)
-        self.assertDepends(source, {('c', 'a'), ('c', 'b')},
-                           {'a', 'b'}, {'c'})
+        self.assertDepends(source, set([('c', 'a'), ('c', 'b')],
+                           set(['a', 'b']), set(['c'])))
     return test_binop
 
 def unarynop_method(op):
     def test_unaryop(self):
         source = 'c = %s b' % (op,)
-        self.assertDepends(source, { ('c', 'b')},
-                           { 'b'}, {'c'})
+        self.assertDepends(source, set([('c', 'b')]),
+                           set(['b']), set(['c']))
     return test_unaryop
 
 @skip_networkx
@@ -52,72 +51,72 @@ class Test(unittest.TestCase):
 
     def test_assign(self):
         source = 'a = b'
-        self.assertDepends(source, {('a', 'b')}, {'b'}, {'a'})
+        self.assertDepends(source, set([('a', 'b')]), set(['b']), set(['a']))
 
     def test_assign_tuple(self):
         source = '(a, c) = b'
-        self.assertDepends(source, {('a', 'b'), ('c', 'b')}, {'b'}, {'a', 'c'})
+        self.assertDepends(source, set([('a', 'b'), ('c', 'b')]), set(['b']), set(['a', 'c']))
 
     def test_assign_multi(self):
         source = 'a = b  = c'
-        self.assertDepends(source, {('a', 'c'), ('b', 'c')},
-                           {'c'}, {'a', 'b'})
+        self.assertDepends(source, set([('a', 'c'), ('b', 'c')]),
+                           set(['c']), set(['a', 'b']))
 
     def test_assign_attr(self):
         source = 'a.x = b'
-        self.assertDepends(source, {('a', 'b')},
-                           {'b', 'a'}, {'a'})
+        self.assertDepends(source, set([('a', 'b')]),
+                           set(['b', 'a']), set(['a']))
 
     def test_attr_assign(self):
         source = 'a = b.x'
-        self.assertDepends(source, {('a', 'b')},
-                           {'b'}, {'a'})
+        self.assertDepends(source, set(['a', 'b']),
+                           set(['b']), set(['a']))
 
     def test_subscr(self):
         source = 'a[:] = b[:]'
-        self.assertDepends(source, {('a', 'b')},
-                           {'a', 'b'}, {'a'})
+        self.assertDepends(source, set(['a', 'b']),
+                           set(['a', 'b']), set(['a']))
 
     def test_subscr_value(self):
         source = 'a = b[c]'
-        self.assertDepends(source, {('a', 'b'), ('a', 'c')},
-                           {'b', 'c'}, {'a'})
+        self.assertDepends(source, set([('a', 'b'), ('a', 'c')]),
+                           set(['b', 'c']), set(['a']))
 
     def test_subscr_lvalue(self):
         source = 'a[c] = b'
-        self.assertDepends(source, {('a', 'b'), ('a', 'c')},
-                           {'a', 'b', 'c'}, {'a'})
+        self.assertDepends(source, set([('a', 'b'), ('a', 'c')]),
+                           set(['a', 'b', 'c']), set(['a']))
 
     def test_subscr_attr(self):
         source = 'a[:] = b[:].b'
-        self.assertDepends(source, {('a', 'b')},
-                           {'a', 'b'}, {'a'})
+        self.assertDepends(source, set(['a', 'b']),
+                           set(['a', 'b']), set(['a']))
 
     def test_import(self):
         source = 'import foo; foo.a = b'
-        self.assertDepends(source, {('foo', 'b')},
-                           {'b'}, {'foo'})
+        self.assertDepends(source, set(['foo', 'b']),
+                           set(['b']), set(['foo']))
 
     def test_import_from(self):
         source = 'from bar import foo; foo.a = b'
-        self.assertDepends(source, {('foo', 'b')},
-                           {'b'}, {'foo'})
+        self.assertDepends(source, set(['foo', 'b']),
+                           set(['b']), set(['foo']))
 
 
     def test_import_as(self):
         source = 'import bar as foo; foo.a = b'
-        self.assertDepends(source, {('foo', 'b')},
-                           {'b'}, {'foo'})
+        self.assertDepends(source, set(['foo', 'b']),
+                           set(['b']), set(['foo']))
 
     def test_import_from_as(self):
         source = 'from bar import baz as foo; foo.a = b'
-        self.assertDepends(source, {('foo', 'b')},
-                           {'b'}, {'foo'})
+        self.assertDepends(source, set(['foo', 'b']),
+                           set(['b']), set(['foo']))
 
 
     def test_augment_assign(self):
         source = 'a += b'
-        self.assertDepends(source, {('a', 'b'), ('a', 'a')}, {'b'}, {'a'})
+        self.assertDepends(source, set([('a', 'b'), ('a', 'a')]), set(['b']), set(['a']))
 
     test_add = binop_method('+')
     test_sub = binop_method('-')
@@ -159,102 +158,102 @@ class Test(unittest.TestCase):
 
     def test_call(self):
         source = 'foo(a)'
-        self.assertDepends(source, {('foo', 'a'), ('a', 'foo')},
-                           {'a', 'foo'},)
+        self.assertDepends(source, set([('foo', 'a'), ('a', 'foo')]),
+                           set(['a', 'foo']),)
 
 
     def test_for(self):
         source = 'for i in a:\n    b'
-        self.assertDepends(source, {('i', 'a'), ('b', 'a')},
-                           {'a', 'b'}, {'i'})
+        self.assertDepends(source, set([('i', 'a'), ('b', 'a')]),
+                           set(['a', 'b']), set(['i']))
 
     def test_for2(self):
         source = 'for i in a:\n    x += b[i]'
-        self.assertDepends(source, {('i', 'a'), ('b', 'a'), ('x', 'a'), ('x', 'i'), ('x', 'b'), ('x', 'x')},
-                           {'a', 'b'}, {'x', 'i'})
+        self.assertDepends(source, set([('i', 'a'), ('b', 'a'), ('x', 'a'), ('x', 'i'), ('x', 'b'), ('x', 'x')]),
+                           set(['a', 'b']), set(['x', 'i']))
 
     def test_for_unpack(self):
         source = 'for i, j in a:\n    x += b[i]'
-        self.assertDepends(source, {('i', 'a'), ('j', 'a'), ('b', 'a'), ('x', 'a'), ('x', 'i'), ('x', 'b'), ('x', 'x')},
-                           {'a', 'b'}, {'x', 'i', 'j'})
+        self.assertDepends(source, set([('i', 'a'), ('j', 'a'), ('b', 'a'), ('x', 'a'), ('x', 'i'), ('x', 'b'), ('x', 'x')]),
+                           set(['a', 'b']), set(['x', 'i', 'j']))
 
 
     def test_dict(self):
         source = 'c = {a:b}'
-        self.assertDepends(source, {('c', 'a'), ('c', 'b')},
-                           {'a', 'b'}, {'c'})
+        self.assertDepends(source, set(['c']),
+                           set(['a', 'b']), set(['c']))
 
     def test_list(self):
         source = 'c = [a,b]'
-        self.assertDepends(source, {('c', 'a'), ('c', 'b')},
-                           {'a', 'b'}, {'c'})
+        self.assertDepends(source, set(['c']),
+                           set(['a', 'b']), set(['c']))
 
     def test_tuple(self):
         source = 'c = (a,b)'
-        self.assertDepends(source, {('c', 'a'), ('c', 'b')},
-                           {'a', 'b'}, {'c'})
+        self.assertDepends(source, set(['c']),
+                           set(['a', 'b']), set(['c']))
 
     def test_set(self):
         source = 'c = {a,b}'
-        self.assertDepends(source, {('c', 'a'), ('c', 'b')},
-                           {'a', 'b'}, {'c'})
+        self.assertDepends(source, set(['c']),
+                           set(['a', 'b']), set(['c']))
 
     def test_if(self):
         source = 'if a: b'
-        self.assertDepends(source, {('b', 'a')}, {'a', 'b'}, set())
+        self.assertDepends(source, set([('b', 'a')]), set(['a', 'b']), set())
 
     def test_if_else(self):
         source = 'if a: b\nelse: c'
-        self.assertDepends(source, {('b', 'a'), ('c', 'a')}, {'a', 'b', 'c'}, set())
+        self.assertDepends(source, set([('b', 'a'), ('c', 'a')]), set(['a', 'b', 'c']), set())
 
     def test_if_elif_else(self):
         source = 'if a: b\nelif x: c\nelse: d'
-        self.assertDepends(source, {('b', 'a'),
+        self.assertDepends(source, set([('b', 'a'),
                                     ('c', 'x'), ('c', 'a'),
                                     ('d', 'a'), ('d', 'x'),
-                                    ('x', 'a')}, {'a', 'b', 'c', 'd', 'x'}, set())
+                                    ('x', 'a')]), set(['a', 'b', 'c', 'd', 'x']), set())
 
     def test_if_expr(self):
         source = 'd = b if a else c'
-        self.assertDepends(source, {('d', 'a'), ('d', 'b'), ('d', 'c')}, {'a', 'b', 'c'}, {'d'})
+        self.assertDepends(source, set([('d', 'a'), ('d', 'b'), ('d', 'c')]), set(['a', 'b', 'c']), set(['d']))
 
     def test_assert(self):
         source = 'assert a'
-        self.assertDepends(source, set(), {'a' }, set())
+        self.assertDepends(source, set(), set(['a']), set())
 
     def test_with(self):
         source = 'with a as b: c'
-        self.assertDepends(source, {('b', 'a'), ('c', 'a')}, {'a', 'c'}, {'b'})
+        self.assertDepends(source, set([('b', 'a'), ('c', 'a')]),set(['a', 'c']), set(['b']))
 
     def test_while(self):
         source = 'while a: c'
-        self.assertDepends(source, {('c', 'a')}, {'a', 'c'})
+        self.assertDepends(source, set([('c', 'a')]), set(['a', 'c']))
 
     def test_function_def(self):
         source = '''a = 1
 def foo(b):
     return a + b
 '''
-        self.assertDepends(source, {('foo', 'a')})
+        self.assertDepends(source, set(['foo', 'a']))
 
     def test_lambda(self):
         source = '''a = 1
 foo = lambda b:  a + b
 '''
-        self.assertDepends(source, {('foo', 'a')})
+        self.assertDepends(source, set(['foo', 'a']))
 
 
     def test_list_comp(self):
         source = 'a = [b for b in c]'
-        self.assertDepends(source, {('a', 'c')})
+        self.assertDepends(source, set(['a', 'c']))
 
     def test_dict_comp(self):
         source = 'a = {b:d for b,d in c}'
-        self.assertDepends(source, {('a', 'c')})
+        self.assertDepends(source, set(['a', 'c']))
 
     def test_set_comp(self):
         source = 'a = {b for b in c}'
-        self.assertDepends(source, {('a', 'c')})
+        self.assertDepends(source, set(['a', 'c']))
 
     def test_try_except(self):
         source = '''
@@ -263,7 +262,7 @@ try:
 except b:
     c
         '''
-        self.assertDepends(source, {('c', 'a'), ('c', 'b')})
+        self.assertDepends(source, set(['c']))
 
     def test_try_except_else(self):
         source = '''
@@ -274,7 +273,7 @@ except b:
 else:
     d
         '''
-        self.assertDepends(source, {('c', 'a'), ('c', 'b'), ('d', 'a')})
+        self.assertDepends(source, set([('c', 'a'), ('c', 'b'), ('d', 'a')]))
 
     def test_try_finally(self):
         source = '''
@@ -285,8 +284,8 @@ except b:
 finally:
     d
         '''
-        self.assertDepends(source, {('c', 'a'), ('c', 'b'), ('d', 'a'),
-                                    ('d', 'b'), ('d', 'c')})
+        self.assertDepends(source, set([('c', 'a'), ('c', 'b'), ('d', 'a'),
+                                    ('d', 'b'), ('d', 'c')]))
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_assign']

@@ -4,7 +4,6 @@ Created on Jul 14, 2011
 @author: sean
 '''
 import unittest
-from meta.testing import py2, py2only
 from meta.decompiler.tests import Base
 
 
@@ -12,7 +11,7 @@ filename = 'tests.py'
 
 
 class LogicJumps(Base):
-        
+
     def test_logic1(self):
         'a and b or c'
         self.statement('a and b or c')
@@ -26,12 +25,12 @@ class LogicJumps(Base):
 
         stmnt = 'a if b else c'
         self.statement(stmnt)
-        
-    @unittest.skip("I think this may be a bug in python")
-    def test_if_expr_const_bug(self):
 
-        stmnt = '0 if 1 else 2'
-        self.statement(stmnt)
+    #@unittest.skip("I think this may be a bug in python")
+    #def test_if_expr_const_bug(self):
+
+        #stmnt = '0 if 1 else 2'
+        #self.statement(stmnt)
 
     def test_if_expr_assign(self):
 
@@ -50,9 +49,9 @@ def foo():
     if a:
         return 1
     else:
-        return 2 
+        return 2
         '''
-        
+
         equiv = '''
 def foo():
     if a:
@@ -60,21 +59,21 @@ def foo():
     return 2
     return None
         '''
-        
-        self.statement(stmnt, equiv=equiv)
-    
-    @unittest.expectedFailure
-    def test_bug011(self):
 
-        stmnt = '''
-def foo():
-    if a or b or c:
-        return 1
-    else:
-        return 2 
-        '''
-        
-        self.statement(stmnt)
+        self.statement(stmnt, equiv=equiv)
+
+    #@unittest.expectedFailure
+    #def test_bug011(self):
+
+        #stmnt = '''
+#def foo():
+    #if a or b or c:
+        #return 1
+    #else:
+        #return 2
+        #'''
+
+        #self.statement(stmnt)
 
 class Function(Base):
 
@@ -180,7 +179,7 @@ class Bar(object):
     a = 1
     def foo(self):
         return None
-        
+
 '''
         self.statement(stmnt)
 
@@ -192,7 +191,7 @@ class Bar(object):
     a = 1
     def foo(self):
         return None
-        
+
 '''
         self.statement(stmnt)
 
@@ -219,7 +218,7 @@ class ControlFlow(Base):
 
     def test_elif(self):
 
-        stmnt = '''if a: 
+        stmnt = '''if a:
     b
 elif c:
     d'''
@@ -227,7 +226,7 @@ elif c:
 
     def test_if_else(self):
 
-        stmnt = '''if a: 
+        stmnt = '''if a:
     b
 else:
     d'''
@@ -235,7 +234,7 @@ else:
 
     def test_if_elif_else(self):
 
-        stmnt = '''if a: 
+        stmnt = '''if a:
     b
 elif f:
     d
@@ -377,6 +376,8 @@ if c > d:
         g
     h
 '''
+        self.statement(stmnt)
+
     def test_loop_bug(self):
         stmnt = '''
 for a in b:
@@ -395,16 +396,16 @@ while a:
         w
 '''
         self.statement(stmnt)
-    
-    @unittest.expectedFailure
-    def test_while_bug02(self):
-        stmnt = '''
-while 1:
-    b += y
-    if b < x: 
-        break        
-'''
-        self.statement(stmnt)
+
+    #@unittest.expectedFailure
+    #def test_while_bug02(self):
+        #stmnt = '''
+#while 1:
+    #b += y
+    #if b < x:
+        #break
+#'''
+        #self.statement(stmnt)
 
 class Complex(Base):
 
@@ -423,7 +424,7 @@ for i in j:
         a
     else:
         b
-        
+
 '''
         self.statement(stmnt)
 
@@ -434,14 +435,14 @@ for i in j:
         break
     else:
         continue
-        
+
 '''
         equiv = '''
 for i in j:
     if i:
         break
         continue
-        
+
 '''
         self.statement(stmnt, equiv)
 
@@ -452,14 +453,14 @@ while i in j:
         a
     else:
         b
-    
+
 '''
         self.statement(stmnt)
 
 
     def test_nested_if(self):
         stmnt = '''
-if a: 
+if a:
     if b:
         c
     else:
@@ -469,7 +470,7 @@ if a:
 
     def test_nested_if2(self):
         stmnt = '''
-if a: 
+if a:
     if b:
         c
     else:
@@ -495,7 +496,7 @@ def a():
         a
     else:
         return b
-        
+
     return c
 '''
         self.statement(stmnt)
@@ -510,12 +511,12 @@ if gid == 0:
 '''
         self.statement(stmnt)
 
-        
+
     def test_aug_assign_slice(self):
         stmnt = 'c[idx:a:3] += b[idx:a]'
         self.statement(stmnt)
-        
-        
+
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.test_assign']
     unittest.main()

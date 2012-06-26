@@ -11,7 +11,7 @@ import sys
 from meta.bytecodetools.disassembler_ import disassembler
 import opcode
 
-py3 = sys.version_info.major >= 3
+py3 = sys.version_info[0] >= 3
 
 co_ord = (lambda c:c) if py3 else ord
 
@@ -22,11 +22,11 @@ def disassemble(co):
 def print_code(co, lasti= -1, level=0):
     """Disassemble a code object."""
     code = co.co_code
-    
+
     for constant in co.co_consts:
         print( '|              |' * level, end=' ')
         print( 'constant:', constant)
-        
+
     labels = findlabels(code)
     linestarts = dict(findlinestarts(co))
     n = len(code)
